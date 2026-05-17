@@ -250,3 +250,105 @@ Instead of manually computing BMI every time, we define it as a **computed prope
 def calculate_bmi(self) -> float:
     bmi = round(self.weight / (self.height / 100 ** 2), 2)
     return bmi
+
+
+Here’s a polished **Markdown (`%md`) documentation cell** for your nested Pydantic model example, highlighting the benefits of **nested models** and the use of `model_dump` options:
+
+```markdown
+# 🩺 Patient Data Model with Nested Models
+
+This notebook demonstrates how to use **nested Pydantic models** to improve **reusability, readability, and validation**.  
+By defining separate models (e.g., `Address`), we can embed them inside other models (e.g., `Patient`), making our code more organized and maintainable.
+
+---
+
+## 📌 Benefits of Nested Models
+- **Reusability**: Define once, reuse across multiple models.
+- **Readability**: Clearer data structure; nested entities are explicit.
+- **Validation**: Each nested model is validated independently, making debugging easier.
+
+---
+
+## 🧑‍⚕️ Address Model
+```python
+class Address(BaseModel):
+    city: str
+    state: str
+    country: str
+    pincode: str
+```
+
+## 🧑‍⚕️ Patient Model
+```python
+class Patient(BaseModel):
+    name: str
+    gender: str
+    age: int
+    address: Address
+```
+
+---
+
+## 🧪 Example Usage
+```python
+address_dict = {"city": "delhi", "state": "delhi", "country": "india", "pincode": "110001"}
+address1 = Address(**address_dict)
+
+patient_info = {"name": "nitish", "gender": "male", "age": 30, "address": address_dict}
+patient1 = Patient(**patient_info)
+
+print(patient1)
+print(patient1.name)
+print(patient1.gender)
+print(patient1.age)
+print(patient1.address.city)
+```
+
+✅ Output shows nested access:
+```
+name='nitish' gender='male' age=30 address=Address(city='delhi', state='delhi', country='india', pincode='110001')
+nitish
+male
+30
+delhi
+```
+
+---
+
+## 📤 Exporting Data
+Pydantic provides multiple ways to **serialize models**:
+
+- **`model_dump()`** → Python dictionary
+- **`model_dump_json()`** → JSON string
+- **`exclude` / `include`** → Control which fields are serialized
+- **`exclude_unset=True`** → Exclude fields not explicitly set
+
+### Examples
+```python
+temp = patient1.model_dump()
+print(temp)  # dict
+
+temp2 = patient1.model_dump_json()
+print(temp2)  # JSON string
+
+temp3 = patient1.model_dump(exclude={"age"})
+print(temp3)  # exclude age
+
+temp4 = patient1.model_dump(exclude={"address": {"state"}})
+print(temp4)  # exclude nested field
+```
+
+---
+
+## 🔑 Key Takeaways
+- Nested models make complex data structures **cleaner and modular**.
+- Use `model_dump` and `model_dump_json` for serialization.
+- Use `include` and `exclude` to control output fields.
+- Use `exclude_unset=True` to omit unset optional fields.
+
+---
+```
+
+This `%md` cell gives you a **clear, professional, and presentation‑ready explanation** of nested models, serialization, and field inclusion/exclusion.  
+
+Would you like me to also add a **visual schema table** (field name, type, nested/primitive, example values) so it looks like a quick reference guide for your Patient + Address model?s
