@@ -130,3 +130,57 @@ Pydantic models can be converted back to common formats:
 Pydantic converts Python’s flexible typing into a structured, production-ready environment. Centralizing validation in models removes boilerplate, ensures data integrity, and creates self-documenting schemas. Whether validating API inputs or cleaning ML pipeline data, Pydantic is an essential tool for robust, maintainable codebases.
 
 ***
+
+# 🩺 Patient Data Model with Pydantic
+
+This notebook demonstrates how to use **Pydantic** for data validation and type enforcement in Python.  
+Every field in a Pydantic model is **required by default**. To make a field optional, use `Optional` from the `typing` module and set its default value to `None`.
+
+---
+
+## 📌 Key Features in the Model
+- **Validation with `Field`**: Enforce constraints such as `min_length`, `max_length`, `gt` (greater than), and descriptive metadata.
+- **Annotated Types**: Use `Annotated` to combine type hints with validation rules.
+- **Automatic Type Conversion**: Pydantic can convert compatible types (e.g., `'30'` → `30`).
+- **Optional Fields**: Mark fields optional with `Optional[...] = None`.
+
+---
+
+## 🧑‍⚕️ Patient Model Fields
+- `name`: String, 2–50 characters, with examples.
+- `email`: Valid email address (`EmailStr`).
+- `Linkdln_profile`: Valid URL (`AnyUrl`).
+- `age`: Integer.
+- `weight`: Float, must be greater than zero.
+- `married`: Boolean, optional with description.
+- `allergies`: List of strings (e.g., `["pollen", "dust"]`).
+- `contact_details`: Dictionary of key-value pairs (e.g., `{"email": "...", "phone": "..."}`).
+
+---
+
+## ⚙️ Functions
+- **`insert_patient_data(patient: Patient)`**  
+  Prints patient details and simulates inserting into a database.
+
+- **`update_patient_data(patient: Patient)`**  
+  Prints patient details and simulates updating in a database.
+
+---
+
+## 🧪 Example Usage
+```python
+patient_info = {
+    "name": "nitish",
+    "age": 30,
+    "email": "nitish@gmail.com",
+    "Linkdln_profile": "https://www.linkedin.com/in/nitish",
+    "weight": 91,
+    "married": False,
+    "allergies": ["pollen", "dust"],
+    "contact_details": {"email": "abc@gmail.com", "phone": "1234567890"}
+}
+
+patient1 = Patient(**patient_info)
+
+insert_patient_data(patient1)
+update_patient_data(patient1)
