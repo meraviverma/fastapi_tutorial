@@ -217,3 +217,36 @@ def validate_emergency_contact(cls, model):
     if model.age > 60 and 'emergency' not in model.contact_details:
         raise ValueError('Emergency contact details are required for patients above 60 years of age')
     return model
+
+# 🩺 Patient Data Model with Computed Field (BMI)
+
+This notebook demonstrates how to use **Pydantic’s `computed_field` decorator** to add derived attributes to a model.  
+Computed fields are **not stored directly in the input data** but are calculated dynamically based on other fields.
+
+---
+
+## 📌 Scenario
+We want to automatically calculate a patient’s **Body Mass Index (BMI)** using their `weight` and `height` fields.  
+Instead of manually computing BMI every time, we define it as a **computed property** inside the model.
+
+---
+
+## 🧑‍⚕️ Patient Model Fields
+- `name`: String
+- `email`: Valid email (`EmailStr`)
+- `age`: Integer
+- `weight`: Float (kg)
+- `height`: Float (cm)
+- `married`: Boolean
+- `allergies`: List of strings
+- `contact_details`: Dictionary of key-value pairs (e.g., `{"emergency": "...", "phone": "..."}`)
+
+---
+
+## ⚙️ Computed Field
+```python
+@computed_field
+@property
+def calculate_bmi(self) -> float:
+    bmi = round(self.weight / (self.height / 100 ** 2), 2)
+    return bmi
