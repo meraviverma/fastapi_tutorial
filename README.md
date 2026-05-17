@@ -1,7 +1,5 @@
 # fastapi_tutorial
 
-Below is a polished, well-structured Markdown version of your Pydantic guide. It’s formatted for readability, with headings, code-style inline notes, callouts, and concise sections suitable for README files, documentation pages, or a blog post.
-
 ***
 
 # Pydantic: A Comprehensive Guide to Data Validation in Python
@@ -184,3 +182,38 @@ patient1 = Patient(**patient_info)
 
 insert_patient_data(patient1)
 update_patient_data(patient1)
+
+
+# 🩺 Patient Data Model with Model Validator
+
+This notebook demonstrates how to use **Pydantic’s `model_validator`** to enforce rules that depend on relationships between multiple fields in a model.  
+Unlike `field_validator`, which validates individual fields, `model_validator` runs **after all fields are validated** and allows us to check cross-field logic.
+
+---
+
+## 📌 Scenario
+We want to ensure that:
+- If a patient’s **age is above 60**, then **emergency contact details must be provided** in `contact_details`.
+
+This is a classic case where **field-level validation is not enough**, and we need **model-level validation**.
+
+---
+
+## 🧑‍⚕️ Patient Model Fields
+- `name`: String
+- `email`: Valid email (`EmailStr`)
+- `age`: Integer
+- `weight`: Float
+- `married`: Boolean
+- `allergies`: List of strings
+- `contact_details`: Dictionary of key-value pairs (e.g., `{"phone": "...", "emergency": "..."}`)
+
+---
+
+## ⚙️ Model Validator
+```python
+@model_validator(mode='after')
+def validate_emergency_contact(cls, model):
+    if model.age > 60 and 'emergency' not in model.contact_details:
+        raise ValueError('Emergency contact details are required for patients above 60 years of age')
+    return model

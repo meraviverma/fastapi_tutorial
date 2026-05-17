@@ -10,7 +10,9 @@ class Patient(BaseModel):
     Linkdln_profile:AnyUrl
     age:int
     weight:float = Field(gt=0, description="Weight must be greater than zero") # we can also add validation for the fields using Field from pydantic
-    married:bool
+    #weight:float = Annotated[float,Field(gt=0,strict=True)] # we can also add validation for the fields using Field from pydantic, strict=True will not allow any type conversion and will raise error if the value is not of type float
+    #married:bool
+    married: Annotated[bool, Field(default=None,description="Is the patient married or not", example=True)]
     allergies:List[str] #allergies: Optional[List[str]] = None # if we want to make it optional need to set default value to None
     #allergies: Optional[List[str]]=Field(max_length=5, description="Maximum of 5 allergies allowed") # we can also add validation for the fields using Field from pydantic
     contact_details:Dict[str,str]
