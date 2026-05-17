@@ -33,3 +33,27 @@ print(patient1.address.city)
 print(patient1.address.state)
 print(patient1.address.country)
 print(patient1.address.pincode)
+
+#export in json
+
+temp=patient1.model_dump()
+print(temp)
+print(type(temp))
+
+temp2=patient1.model_dump_json()
+print(temp2)
+print(type(temp2))
+
+temp3=patient1.model_dump(exclude={'age'})
+print(temp3)
+
+temp4=patient1.model_dump(exclude={'address':{'state'}})
+print(temp4)
+
+#exclude is used to exclude certain fields from the output. We can also use include to include only certain fields in the output. For example, if we want to include only name and age in the output, we can use include={'name','age'}.
+
+#include is used to include only certain fields in the output. We can also use exclude to exclude certain fields from the output. For example, if we want to exclude age from the output, we can use exclude={'age'}.
+
+#exclude_unset is used to exclude fields that are not set in the model. For example, if we have a field that is optional and it is not set in the model, it will be excluded from the output if we use exclude_unset=True. This is useful when we want to serialize the model and we don't want to include fields that are not set.
+
+#example exclude_unset={'married':True} # if we want to exclude married field from the output if it is not set in the model, we can use exclude_unset={'married':True}. This will exclude the married field from the output if it is not set in the model. If it is set in the model, it will be included in the output. This is useful when we want to serialize the model and we don't want to include fields that are not set.
