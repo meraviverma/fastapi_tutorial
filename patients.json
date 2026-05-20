@@ -39,22 +39,24 @@
         "bmi": 27.78,
         "verdict": "Normal"
     },
-    "P005": {
-        "name": "Neha Sinha",
-        "city": "Kolkata",
-        "age": 30,
-        "gender": "female",
-        "height": 1.55,
-        "weight": 75,
-        "bmi": 31.22,
-        "verdict": "Obese"
-    },
-    "P006": {
-        "name": "Ravi Doe",
-        "city": "New Jersey",
+    "P008": {
+        "name": "steve bonjor",
+        "city": "New jersey",
         "age": 30,
         "gender": "male",
         "height": 175.5,
-        "weight": 70.0
+        "weight": 100.0,
+        "calculate_bmi": 32.47,
+        "verdict": "Obese"
+    },
+    "P005": {
+        "name": "Ravi Verma",
+        "city": "Hyderabad",
+        "age": 40,
+        "gender": "male",
+        "height": 194.0,
+        "weight": 80.0,
+        "calculate_bmi": 21.26,
+        "verdict": "Normal weight"
     }
 }

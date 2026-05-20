@@ -1,3 +1,18 @@
+# Commands
+
+## Install Pydantic
+
+```bash
+pip install --upgrade pydantic
+```
+
+## Setup
+
+1. python -m venv myenv
+2. myenv\Scripts\activate
+3. pip install fastapi uvicorn pydantic
+4. uvicorn main:app --reload
+
 # fastapi_tutorial
 
 ***
@@ -534,5 +549,133 @@ def create_patient(patient: Patient):
 - **Functions**: Load/save JSON data.
 - **Endpoints**: CRUD-like operations (read, sort, create).
 - **Error Handling**: Uses `HTTPException` for invalid inputs.
+
+---
+
+# Pydantic Update
+
+## Pydantic Update API Documentation
+
+### Overview
+A FastAPI app using Pydantic models to manage patient records stored in patients.json. It supports creating, reading, sorting, and updating patient data while recalculating BMI and health verdict automatically.
+
+---
+
+### Models
+
+#### `Patient`
+- `id`: `str`
+- `name`: `str`
+- `city`: `str`
+- `age`: `int`
+- `gender`: `Literal['male','female','others']`
+- `height`: `float` (cm)
+- `weight`: `float` (kg)
+
+Computed fields:
+- `calculate_bmi`: `float`
+  - BMI calculated from `weight / (height/100)^2`
+- `verdict`: `str`
+  - Returns:
+    - `Underweight` if BMI < 18.5
+    - `Normal weight` if BMI < 25
+    - `Overweight` if BMI < 30
+    - `Obese` otherwise
+
+#### `PatientUpdate`
+- All fields optional:
+  - `name`
+  - `city`
+  - `age`
+  - `gender`
+  - `height`
+  - `weight`
+
+Used for partial updates without overwriting missing data.
+
+---
+
+### Endpoints
+
+#### `GET /`
+Returns:
+```json
+{ "message": "Welcome to the Patient API" }
+```
+
+#### `GET /about`
+Returns:
+```json
+{ "message": "This is a simple Patient API" }
+```
+
+#### `GET /patients`
+Returns all stored patients from the JSON file:
+```json
+{ "patients": { ... } }
+```
+
+#### `GET /sort`
+Query parameters:
+- `sort_by`: `height`, `weight`, or `bmi`
+- `order`: `asc` or `desc`
+
+Returns sorted patient records.
+
+#### `POST /create`
+Request body: `Patient`
+- Creates a new patient
+- Saves data to JSON
+- Uses `patient.model_dump(exclude=['id'])` to persist fields
+
+Response:
+```json
+{ "message": "Patient created successfully", "patient_id": "<id>" }
+```
+
+#### `PUT /update/{patient_id}`
+Request body: `PatientUpdate`
+- Updates only provided fields
+- Recalculates computed fields (`bmi`, `verdict`) by creating a `Patient` instance after update
+- Saves updated patient back to JSON
+
+Response:
+```json
+{ "message": "Patient updated successfully", "patient_id": "<id>" }
+```
+
+---
+
+### Important Details
+- Computed fields are created with `@computed_field` and `@property`
+- The code recalculates BMI and verdict during update by reconstructing `Patient`
+- JSON persistence is handled using:
+  - `load_data()` → reads patients.json
+  - `save_data()` → writes patients.json
+
+---
+
+### Sample Requests
+
+#### Create patient
+```json
+{
+  "id": "P001",
+  "name": "John Doe",
+  "city": "New York",
+  "age": 30,
+  "gender": "male",
+  "height": 175.5,
+  "weight": 70.0
+}
+```
+
+#### Update patient
+```json
+{
+  "city": "Los Angeles",
+  "weight": 72.5
+}
+```
 
 ---

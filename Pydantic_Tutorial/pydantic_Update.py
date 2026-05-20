@@ -1,4 +1,4 @@
-from typing import Annotated,Literal
+from typing import Annotated,Literal, Optional
 
 from pydantic import Field,BaseModel,computed_field
 
@@ -36,6 +36,14 @@ class Patient(BaseModel):
             return "Overweight"
         else:
             return "Obese"
+
+class PatientUpdate(BaseModel):
+    name: Annotated[Optional[str],Field(default=None)]
+    city: Annotated[Optional[str],Field(default=None)]
+    age: Annotated[Optional[int],Field(default=None,gt=0)]
+    gender: Annotated[Optional[Literal['male','female','others']],Field(default=None)]
+    height: Annotated[Optional[float],Field(default=None,gt=0)]
+    weight: Annotated[Optional[float],Field(default=None,gt=0)]
 
 def load_data():
     """Load patient data from a JSON file."""
@@ -83,8 +91,6 @@ def save_data(data):
 def create_patient(patient:Patient):
     """Create a new patient record."""
     data=load_data()
-
-    #check if patient with same id already exists
     if patient.id in data:
         raise HTTPException(status_code=400, detail="Patient with this ID already exists.")
     
@@ -93,3 +99,38 @@ def create_patient(patient:Patient):
     #save into json file
     save_data(data)
     return JSONResponse(content={"message": "Patient created successfully", "patient_id": patient.id}, status_code=201)
+
+@app.put('/update/{patient_id}')
+def update_patient(patient_id: str, patient_update: PatientUpdate):
+    """Update an existing patient record."""
+    data = load_data()
+    
+    # Check if the patient with the given ID exists
+    if patient_id not in data:
+        raise HTTPException(status_code=404, detail="Patient not found.")
+    
+    # Update the existing patient data with the new values
+    existing_patient = data[patient_id]
+    
+    update_data = patient_update.model_dump(exclude_unset=True)  # Get only the fields that were provided in the update request
+    #exclude_unset=True ensures that only the fields that were actually provided in the update request are included in the update_data dictionary. This way, we won't overwrite existing values with None if they were not included in the update request.
+    
+    # Update the existing patient data with the new values provided in the update request
+    # We iterate through the update_data dictionary and update the corresponding fields in the existing_patient dictionary. This allows us to only update the fields that were provided in the update request, while keeping the other fields unchanged.
+    #example: if the update request only includes a new value for the 'city' field, then only the 'city' field in the existing patient data will be updated, while the other fields like 'name', 'age', etc. will remain unchanged.
+    #Example: if the existing patient data is {"name": "John Doe", "city": "New York", "age": 30} and the update request includes {"city": "Los Angeles"}, then after the update, the existing patient data will be updated to {"name": "John Doe", "city": "Los Angeles", "age": 30}.
+    for key, value in update_data.items():
+        existing_patient[key] = value  # Update the existing patient data with new values
+    
+    #Once we update the weight or height, we need to recalculate the BMI and verdict as they are computed fields based on weight and height. So we need to update those fields as well in the existing patient data.
+    # Save the updated data back to the JSON file
+
+    existing_patient['id']= patient_id  # Ensure the ID becomes part of object
+    patient_pydantic_object = Patient(**existing_patient)  # Create a Patient instance to recalculate computed fields like BMI and verdict
+    existing_patient=patient_pydantic_object.model_dump(exclude=['id'])  # Update existing patient data with recalculated fields, excluding 'id' as it is already set
+    
+    data[patient_id] = existing_patient  # Update the patient data in the main data dictionary
+    
+    save_data(data)
+    
+    return JSONResponse(content={"message": "Patient updated successfully", "patient_id": patient_id}, status_code=200)
