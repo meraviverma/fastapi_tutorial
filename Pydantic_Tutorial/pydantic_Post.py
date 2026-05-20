@@ -3,6 +3,7 @@ from typing import Annotated,Literal
 from pydantic import Field,BaseModel,computed_field
 
 from fastapi import FastAPI,Path, HTTPException,Query
+from fastapi.responses import JSONResponse
 import json
 
 app = FastAPI()
@@ -37,7 +38,7 @@ def verdict(self)->str:
         return "Obese"
 def load_data():
     """Load patient data from a JSON file."""
-    with open("patients.json", "r") as file:
+    with open("D:/FASTAPI/patients.json", "r") as file:
         data=json.load(file)
     return data
 
@@ -72,7 +73,20 @@ def sort_patients(sort_by: str = Query(..., description="Sort on basis of height
 
     return sorted_data
 
+def save_data(data):
+    """Save patient data to a JSON file."""
+    with open("D:/FASTAPI/patients.json", "w") as file:
+        json.dump(data, file, indent=4) # Save data with indentation for better readability
+
 @app.post('/create')
 def create_patient(patient:Patient):
     """Create a new patient record."""
-    return {"message":"Patient created successfully", "patient":patient}
+    data=load_data()
+    if patient.id in data:
+        raise HTTPException(status_code=400, detail="Patient with this ID already exists.")
+    
+    data[patient.id] = patient.model_dump(exclude=['id'])  # Convert Pydantic model to a dictionary
+
+    #save into json file
+    save_data(data)
+    return JSONResponse(content={"message": "Patient created successfully", "patient_id": patient.id}, status_code=201)
