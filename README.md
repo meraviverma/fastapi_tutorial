@@ -12,7 +12,7 @@ pip install --upgrade pydantic
 2. myenv\Scripts\activate
 3. pip install fastapi uvicorn pydantic
 4. uvicorn main:app --reload
-
+5. To see Doc string http://127.0.0.1:8000/docs#/
 # fastapi_tutorial
 
 ***
